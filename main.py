@@ -22,4 +22,11 @@ class MerkleTree:
                 new_level.append(hash(left + right))
             current_level = new_level
         return current_level[0]
-
+class Block:
+    def init(self, index, previous_hash, transactions):
+        self.index = index
+        self.previous_hash = previous_hash
+        self.timestamp = time.time()
+        self.transactions = transactions  
+        self.merkle_root = MerkleTree(transactions).root 
+        self.hash = self.compute_hash()
