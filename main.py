@@ -51,3 +51,29 @@ class Blockchain:
     def add_transaction(self, sender, receiver, amount):
         transaction = f"{sender}->{receiver}:{amount}"
         self.pending_transactions.append(transaction)
+
+
+if __name__ == "__main__":
+    blockchain = Blockchain()
+
+    for i in range(20):
+        blockchain.add_transaction(f"User{i}", f"User{i+1}", i * 10)
+        blockchain.add_transaction(f"User{i}", f"User{i+1}", i * 10)
+
+    print("Майнинг первого блока...")
+    blockchain.mine_block()
+
+    blockchain.chain[0].hash = "0000"
+
+    print("Майнинг второго блока...")
+    blockchain.mine_block()
+
+    blockchain.add_transaction("UserX", "UserY", -50)
+
+    print("Целостность блокчейна:", blockchain.validate_blockchain())
+
+    if len(blockchain.chain) > 1:
+        blockchain.chain[1].transactions[0].amount = 9999
+
+    for block in blockchain.chain:
+        print(f"Блок {block.index} | Хэш: {block.hash} | Предыдущий хэш: {block.previous_hash}")
