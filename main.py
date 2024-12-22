@@ -22,24 +22,22 @@ class MerkleTree:
                 new_level.append(hash(left + right))
             current_level = new_level
         return current_level[0]
+
 class Block:
-    def init(self, index, previous_hash, transactions):
+    def __init__(self, index, previous_hash, transactions):
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = time.time()
-        self.transactions = transactions  
-        self.merkle_root = MerkleTree(transactions).root 
+        self.transactions = transactions
+        self.merkle_root = MerkleTree(transactions).root
         self.hash = self.compute_hash()
-def compute_hash(self):
-        """
-        Вычисляет хэш блока на основе его данных.
-        """
+
+    def compute_hash(self):
         block_string = f"{self.index}{self.previous_hash}{self.timestamp}{self.merkle_root}"
         return hash(block_string)
 
-# Blockchain Class
 class Blockchain:
-    def init(self):
+    def __init__(self):
         self.chain = []
         self.pending_transactions = []
         self.create_genesis_block()
@@ -52,6 +50,29 @@ class Blockchain:
         transaction = f"{sender}->{receiver}:{amount}"
         self.pending_transactions.append(transaction)
 
+    def mine_block(self):
+        if len(self.pending_transactions) < 10:
+            raise ValueError("Недостаточно транзакций для майнинга блока!")
+
+        transactions = self.pending_transactions[:10]
+        self.pending_transactions = self.pending_transactions[10:]
+
+        last_block = self.chain[-1]
+        new_block = Block(len(self.chain), last_block.hash, transactions)
+        self.chain.append(new_block)
+
+    def validate_blockchain(self):
+        for i in range(1, len(self.chain)):
+            current_block = self.chain[i]
+            previous_block = self.chain[i - 1]
+
+            if current_block.previous_hash != previous_block.hash:
+                return False
+
+            if current_block.hash != current_block.compute_hash():
+                return False
+
+        return True
 
 if __name__ == "__main__":
     blockchain = Blockchain()
@@ -68,4 +89,3 @@ if __name__ == "__main__":
 
     for block in blockchain.chain:
         print(f"Блок {block.index} | Хэш: {block.hash} | Предыдущий хэш: {block.previous_hash}")
-
